@@ -83,11 +83,14 @@
             justify-content: center;
             margin: 30px 0;
             height: 200px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .keyboard-inner {
             position: relative;
             display: flex;
+            flex-shrink: 0;
         }
         
         .key {
@@ -627,6 +630,289 @@
             gap: 10px;
             margin: 20px 0;
         }
+
+        /* Touch improvements */
+        .key, .btn, .mode-btn, .answer-btn, .length-btn, .playback-btn, .env-btn {
+            touch-action: manipulation;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 6px;
+            }
+
+            .container {
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.4em;
+                margin-bottom: 4px;
+            }
+
+            .subtitle {
+                margin-bottom: 8px;
+                font-size: 12px;
+            }
+
+            .mode-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .mode-selector {
+                gap: 5px;
+                margin-bottom: 8px;
+            }
+
+            /* Compact stats into a single tight row */
+            .stats {
+                padding: 8px;
+                margin: 6px 0;
+                border-radius: 10px;
+            }
+
+            .stat-value {
+                font-size: 20px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+                margin-top: 2px;
+            }
+
+            .practice-area {
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+
+            .controls {
+                gap: 8px;
+                margin: 8px 0;
+            }
+
+            .answer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+                gap: 6px;
+                margin: 8px 0;
+            }
+
+            .answer-btn {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .degree-answer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+                gap: 5px;
+                margin: 8px 0;
+            }
+
+            .feedback {
+                font-size: 16px;
+                margin: 6px 0;
+                min-height: 22px;
+            }
+
+            /* Keyboard scaling */
+            .keyboard {
+                height: 130px;
+                justify-content: flex-start;
+                margin: 8px 0;
+            }
+
+            .white-key {
+                width: 34px;
+                height: 130px;
+                font-size: 10px;
+                padding-bottom: 4px;
+            }
+
+            .white-key .note-name {
+                font-size: 9px;
+            }
+
+            .white-key .degree-label {
+                font-size: 11px;
+            }
+
+            .black-key {
+                width: 22px;
+                height: 78px;
+                font-size: 8px;
+                padding-bottom: 3px;
+            }
+
+            .black-key .note-name {
+                font-size: 7px;
+            }
+
+            .black-key .degree-label {
+                font-size: 9px;
+            }
+
+            /* Harmonic env */
+            .harmonic-env {
+                margin: 6px 0;
+                padding: 8px;
+            }
+
+            .harmonic-env h3 {
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+
+            .scale-degrees {
+                gap: 5px;
+                margin-top: 5px;
+                flex-wrap: wrap;
+            }
+
+            .scale-degrees .degree {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            /* Melody and scale note circles */
+            .melody-note {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .melody-note .scale-degree {
+                font-size: 9px;
+                bottom: -16px;
+            }
+
+            .melody-display, .user-melody {
+                gap: 6px;
+                margin: 6px 0;
+                min-height: 40px;
+                flex-wrap: wrap;
+            }
+
+            .recording-status {
+                font-size: 13px;
+                margin: 4px 0;
+                min-height: 18px;
+            }
+
+            .scale-note {
+                width: 30px;
+                height: 30px;
+                font-size: 11px;
+            }
+
+            .scale-pattern {
+                gap: 4px;
+                padding: 8px;
+                margin: 6px 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .chord-tone {
+                width: 36px;
+                height: 36px;
+                font-size: 11px;
+            }
+
+            .chord-tones {
+                gap: 6px;
+                margin-top: 5px;
+            }
+
+            /* Chord info */
+            .chord-info {
+                margin: 6px 0;
+                padding: 8px;
+            }
+
+            .chord-info h3 {
+                font-size: 15px;
+                margin-bottom: 5px;
+            }
+
+            .root-display {
+                font-size: 18px;
+                margin: 4px 0;
+            }
+
+            .playback-mode {
+                margin: 6px 0;
+            }
+
+            /* Env selector wrapping */
+            .env-selector {
+                gap: 4px;
+            }
+
+            .env-btn {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .melody-controls {
+                gap: 8px;
+                margin: 6px 0;
+            }
+
+            .playback-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .length-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            .toggle-label {
+                font-size: 12px;
+            }
+
+            .submit-controls {
+                gap: 6px;
+                margin: 6px 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .scale-degree-controls {
+                gap: 8px;
+                margin: 6px 0;
+            }
+
+            .sequence-controls, .reference-toggle {
+                gap: 6px;
+            }
+
+            /* Step controls need wrapping */
+            #step-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            #step-controls .btn {
+                margin-left: 0 !important;
+            }
+
+            #step-status {
+                font-size: 13px !important;
+                margin: 4px 8px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -940,14 +1226,19 @@
 
                     if (octave === 0 && i === 0) whiteKey.classList.add('root');
 
-                    whiteKey.addEventListener('click', () => {
+                    const handleWhiteKey = () => {
                         const midi = parseInt(whiteKey.dataset.midi);
                         if (currentMode === 'melodic' && isRecording) {
                             recordNote(midi);
                         } else {
                             playNote(midiToFreq(midi), 0.5);
                         }
-                    });
+                    }
+                    whiteKey.addEventListener('click', handleWhiteKey);
+                    whiteKey.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        handleWhiteKey();
+                    }, { passive: false });
 
                     inner.appendChild(whiteKey);
                 }
@@ -958,9 +1249,14 @@
             finalC.className = 'key white-key';
             finalC.dataset.midi = startMidi + 24;
             finalC.innerHTML = `<div class="degree-label">${getScaleDegree(startMidi + 24)}</div><div class="note-name">C6</div>`;
-            finalC.addEventListener('click', () => {
+            function handleFinalC() {
                 playNote(midiToFreq(parseInt(finalC.dataset.midi)), 0.5);
-            });
+            }
+            finalC.addEventListener('click', handleFinalC);
+            finalC.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleFinalC();
+            }, { passive: false });
             inner.appendChild(finalC);
 
             // Create black keys - positioned between appropriate white keys
@@ -973,6 +1269,17 @@
                 { afterWhite: 5, semitone: 10, name: 'A#' }  // A#
             ];
 
+            // Read actual rendered white and black key widths so black keys align on mobile
+            const firstWhite = inner.querySelector('.white-key');
+            const wkWidth = firstWhite ? firstWhite.getBoundingClientRect().width : 50;
+            // Probe black key width by temporarily adding one
+            const probe = document.createElement('div');
+            probe.className = 'key black-key';
+            probe.style.visibility = 'hidden';
+            inner.appendChild(probe);
+            const bkWidth = probe.getBoundingClientRect().width || 30;
+            inner.removeChild(probe);
+
             for (let octave = 0; octave < 2; octave++) {
                 blackKeyPattern.forEach(black => {
                     const midiNote = startMidi + octave * 12 + black.semitone;
@@ -983,16 +1290,21 @@
                     blackKey.className = 'key black-key';
                     blackKey.dataset.midi = midiNote;
                     blackKey.innerHTML = `<div class="degree-label">${getScaleDegree(midiNote)}</div><div class="note-name">${noteName}</div>`;
-                    blackKey.style.left = (whiteKeyPosition * 52 + 37) + 'px';
+                    blackKey.style.left = ((whiteKeyPosition + 1) * wkWidth - bkWidth / 2) + 'px';
 
-                    blackKey.addEventListener('click', () => {
+                    const handleBlackKey = () => {
                         const midi = parseInt(blackKey.dataset.midi);
                         if (currentMode === 'melodic' && isRecording) {
                             recordNote(midi);
                         } else {
                             playNote(midiToFreq(midi), 0.5);
                         }
-                    });
+                    }
+                    blackKey.addEventListener('click', handleBlackKey);
+                    blackKey.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        handleBlackKey();
+                    }, { passive: false });
 
                     inner.appendChild(blackKey);
                 });
@@ -1881,6 +2193,13 @@
             });
         });
         
+        // Rebuild keyboard on resize so black keys realign
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(createKeyboard, 150);
+        });
+
         // Initialize
         createKeyboard();
         createAnswerButtons();
