@@ -83,7 +83,11 @@
             justify-content: center;
             margin: 30px 0;
             height: 200px;
+        }
+
+        .keyboard-inner {
             position: relative;
+            display: flex;
         }
         
         .key {
@@ -915,23 +919,27 @@
         function createKeyboard() {
             const keyboard = document.getElementById('keyboard');
             keyboard.innerHTML = '';
-            
+
+            const inner = document.createElement('div');
+            inner.className = 'keyboard-inner';
+            keyboard.appendChild(inner);
+
             const whiteKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
             const startMidi = 60; // Middle C (C4)
-            
+
             // Create white keys first
             for (let octave = 0; octave < 2; octave++) {
                 for (let i = 0; i < 7; i++) {
                     const noteName = whiteKeys[i] + (4 + octave);
                     const midiNote = startMidi + octave * 12 + [0, 2, 4, 5, 7, 9, 11][i];
-                    
+
                     const whiteKey = document.createElement('div');
                     whiteKey.className = 'key white-key';
                     whiteKey.dataset.midi = midiNote;
                     whiteKey.innerHTML = `<div class="degree-label">${getScaleDegree(midiNote)}</div><div class="note-name">${noteName}</div>`;
-                    
+
                     if (octave === 0 && i === 0) whiteKey.classList.add('root');
-                    
+
                     whiteKey.addEventListener('click', () => {
                         const midi = parseInt(whiteKey.dataset.midi);
                         if (currentMode === 'melodic' && isRecording) {
@@ -940,11 +948,11 @@
                             playNote(midiToFreq(midi), 0.5);
                         }
                     });
-                    
-                    keyboard.appendChild(whiteKey);
+
+                    inner.appendChild(whiteKey);
                 }
             }
-            
+
             // Add the final C at the top
             const finalC = document.createElement('div');
             finalC.className = 'key white-key';
@@ -953,8 +961,8 @@
             finalC.addEventListener('click', () => {
                 playNote(midiToFreq(parseInt(finalC.dataset.midi)), 0.5);
             });
-            keyboard.appendChild(finalC);
-            
+            inner.appendChild(finalC);
+
             // Create black keys - positioned between appropriate white keys
             // Black keys appear after: C, D, F, G, A (not after E or B)
             const blackKeyPattern = [
@@ -964,19 +972,19 @@
                 { afterWhite: 4, semitone: 8, name: 'G#' },  // G#
                 { afterWhite: 5, semitone: 10, name: 'A#' }  // A#
             ];
-            
+
             for (let octave = 0; octave < 2; octave++) {
                 blackKeyPattern.forEach(black => {
                     const midiNote = startMidi + octave * 12 + black.semitone;
                     const whiteKeyPosition = octave * 7 + black.afterWhite;
                     const noteName = black.name + (4 + octave);
-                    
+
                     const blackKey = document.createElement('div');
                     blackKey.className = 'key black-key';
                     blackKey.dataset.midi = midiNote;
                     blackKey.innerHTML = `<div class="degree-label">${getScaleDegree(midiNote)}</div><div class="note-name">${noteName}</div>`;
                     blackKey.style.left = (whiteKeyPosition * 52 + 37) + 'px';
-                    
+
                     blackKey.addEventListener('click', () => {
                         const midi = parseInt(blackKey.dataset.midi);
                         if (currentMode === 'melodic' && isRecording) {
@@ -985,8 +993,8 @@
                             playNote(midiToFreq(midi), 0.5);
                         }
                     });
-                    
-                    keyboard.appendChild(blackKey);
+
+                    inner.appendChild(blackKey);
                 });
             }
         }
