@@ -1235,10 +1235,6 @@
                         }
                     }
                     whiteKey.addEventListener('click', handleWhiteKey);
-                    whiteKey.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        handleWhiteKey();
-                    }, { passive: false });
 
                     inner.appendChild(whiteKey);
                 }
@@ -1253,10 +1249,6 @@
                 playNote(midiToFreq(parseInt(finalC.dataset.midi)), 0.5);
             }
             finalC.addEventListener('click', handleFinalC);
-            finalC.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleFinalC();
-            }, { passive: false });
             inner.appendChild(finalC);
 
             // Create black keys - positioned between appropriate white keys
@@ -1301,10 +1293,6 @@
                         }
                     }
                     blackKey.addEventListener('click', handleBlackKey);
-                    blackKey.addEventListener('touchstart', (e) => {
-                        e.preventDefault();
-                        handleBlackKey();
-                    }, { passive: false });
 
                     inner.appendChild(blackKey);
                 });
