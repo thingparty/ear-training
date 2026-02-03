@@ -218,7 +218,34 @@
             background: #653a8d;
             transform: translateY(-2px);
         }
-        
+
+        .keyboard-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-small {
+            padding: 5px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            background: #e0e0e0;
+            color: #555;
+        }
+
+        .btn-small:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-small.active {
+            background: #4caf50;
+            color: white;
+        }
+
         .answer-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -236,11 +263,33 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
-        
+
         .answer-btn:hover {
             background: #f0f0ff;
             transform: scale(1.05);
+        }
+
+        .answer-btn .play-icon {
+            font-size: 11px;
+            opacity: 0.6;
+            transition: all 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .answer-btn .play-icon:hover {
+            opacity: 1;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .answer-btn .play-icon.playing {
+            opacity: 1;
+            color: #4caf50;
         }
         
         .answer-btn.correct {
@@ -1012,8 +1061,8 @@
                 </div>
                 <div class="reference-toggle">
                     <span class="toggle-label">Play Reference (1):</span>
-                    <button class="playback-btn reference-btn active" data-reference="yes">Yes</button>
-                    <button class="playback-btn reference-btn" data-reference="no">No</button>
+                    <button class="playback-btn reference-btn" data-reference="yes">Yes</button>
+                    <button class="playback-btn reference-btn active" data-reference="no">No</button>
                 </div>
             </div>
             
@@ -1038,8 +1087,12 @@
                 <button class="btn btn-submit" id="start-recording-btn" style="margin-left: 20px;">✓ Ready to Play Back</button>
             </div>
             
+            <div class="keyboard-controls">
+                <button class="btn btn-small" id="listen-mode-btn">🎧 Listen Mode: Off</button>
+            </div>
+
             <div class="keyboard" id="keyboard"></div>
-            
+
             <div class="controls">
                 <button class="btn btn-primary" id="play-btn">🔊 Play Interval</button>
                 <button class="btn btn-secondary" id="replay-btn">🔁 Replay</button>
@@ -1067,6 +1120,7 @@
         let currentMelody = [];
         let userMelody = [];
         let isRecording = false;
+        let listenMode = false;
         let melodyEnv = 1;
         let currentStepIndex = 0;
         
@@ -1076,7 +1130,7 @@
         
         // Scale degrees variables
         let scaleSequenceMode = 'single'; // 'single' or 'sequence'
-        let playReference = true;
+        let playReference = false;
         let selectedEnv = 1;
         let currentScaleDegrees = [];
         let targetDegrees = [];
@@ -1236,7 +1290,9 @@
 
                     const handleWhiteKey = () => {
                         const midi = parseInt(whiteKey.dataset.midi);
-                        if (currentMode === 'melodic' && isRecording) {
+                        if (listenMode) {
+                            playNote(midiToFreq(midi), 0.5);
+                        } else if (currentMode === 'melodic' && isRecording) {
                             recordNote(midi);
                         } else {
                             playNote(midiToFreq(midi), 0.5);
@@ -1294,7 +1350,9 @@
 
                     const handleBlackKey = () => {
                         const midi = parseInt(blackKey.dataset.midi);
-                        if (currentMode === 'melodic' && isRecording) {
+                        if (listenMode) {
+                            playNote(midiToFreq(midi), 0.5);
+                        } else if (currentMode === 'melodic' && isRecording) {
                             recordNote(midi);
                         } else {
                             playNote(midiToFreq(midi), 0.5);
@@ -1375,7 +1433,40 @@
             
             document.getElementById('feedback').textContent = '';
         }
-        
+
+        // Play a specific interval by name (for interval button preview)
+        function playIntervalByName(intervalName) {
+            const interval = intervals.find(i => i.name === intervalName);
+            if (!interval) return;
+
+            initAudio();
+
+            const keyboardStart = 60; // Middle C (C4)
+            const keyboardEnd = 84; // C6
+            const direction = Math.random() > 0.5 ? 1 : -1; // Random ascending or descending
+
+            let note1, note2;
+
+            if (direction > 0) {
+                // Ascending: start note must allow interval to fit above
+                const maxStart = keyboardEnd - interval.semitones;
+                note1 = keyboardStart + Math.floor(Math.random() * (maxStart - keyboardStart + 1));
+                note2 = note1 + interval.semitones;
+            } else {
+                // Descending: start note must allow interval to fit below
+                const minStart = keyboardStart + interval.semitones;
+                note1 = minStart + Math.floor(Math.random() * (keyboardEnd - minStart + 1));
+                note2 = note1 - interval.semitones;
+            }
+
+            // Play notes
+            playNote(midiToFreq(note1), 1, 0);
+            playNote(midiToFreq(note2), 1, 1);
+
+            // Highlight on keyboard
+            highlightKeys([note1, note2]);
+        }
+
         // Generate and play melody
         function playMelody() {
             initAudio();
@@ -1608,15 +1699,53 @@
             createChordAnswerButtons();
         }
         
+        // Play a chord by quality name (for preview)
+        function playChordByQuality(qualityName) {
+            const intervals = chordQualities[qualityName];
+            if (!intervals) return;
+
+            initAudio();
+
+            // Play from middle C (60) in root position
+            const root = 60;
+            const notes = intervals.map(interval => root + interval);
+
+            // Play as block chord
+            notes.forEach(note => {
+                playNote(midiToFreq(note), 1.5, 0);
+            });
+
+            highlightKeys(notes);
+        }
+
         // Create chord answer buttons
         function createChordAnswerButtons() {
             const grid = document.getElementById('answer-grid');
             grid.innerHTML = '';
-            
+
             Object.keys(chordQualities).forEach(quality => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
-                btn.textContent = quality;
+                btn.dataset.chord = quality;
+
+                // Create play icon
+                const playIcon = document.createElement('span');
+                playIcon.className = 'play-icon';
+                playIcon.textContent = '🔊';
+                playIcon.title = 'Play this chord';
+                playIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playIcon.classList.add('playing');
+                    playChordByQuality(quality);
+                    setTimeout(() => playIcon.classList.remove('playing'), 1500);
+                });
+
+                // Create label span
+                const label = document.createElement('span');
+                label.textContent = quality;
+
+                btn.appendChild(playIcon);
+                btn.appendChild(label);
                 btn.addEventListener('click', () => checkChordAnswer(quality));
                 grid.appendChild(btn);
             });
@@ -1649,13 +1778,13 @@
             // Highlight answer button
             const buttons = document.querySelectorAll('.answer-btn');
             buttons.forEach(btn => {
-                if (btn.textContent === answer) {
+                if (btn.dataset.chord === answer) {
                     btn.classList.add(isCorrect ? 'correct' : 'incorrect');
                     setTimeout(() => btn.classList.remove('correct', 'incorrect'), 1500);
                 }
             });
         }
-        
+
         // Display scale pattern
         function displayScalePattern() {
             const pattern = scalePatterns[selectedEnv];
@@ -1861,12 +1990,31 @@
         function createAnswerButtons() {
             const grid = document.getElementById('answer-grid');
             grid.innerHTML = '';
-            
+
             if (currentMode === 'intervals') {
                 intervals.forEach(interval => {
                     const btn = document.createElement('button');
                     btn.className = 'answer-btn';
-                    btn.textContent = interval.name;
+                    btn.dataset.interval = interval.name;
+
+                    // Create play icon
+                    const playIcon = document.createElement('span');
+                    playIcon.className = 'play-icon';
+                    playIcon.textContent = '🔊';
+                    playIcon.title = 'Play this interval';
+                    playIcon.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Don't trigger answer check
+                        playIcon.classList.add('playing');
+                        playIntervalByName(interval.name);
+                        setTimeout(() => playIcon.classList.remove('playing'), 2000);
+                    });
+
+                    // Create label span
+                    const label = document.createElement('span');
+                    label.textContent = interval.name;
+
+                    btn.appendChild(playIcon);
+                    btn.appendChild(label);
                     btn.addEventListener('click', () => checkAnswer(interval.name));
                     grid.appendChild(btn);
                 });
@@ -1896,13 +2044,13 @@
             // Highlight answer button
             const buttons = document.querySelectorAll('.answer-btn');
             buttons.forEach(btn => {
-                if (btn.textContent === answer) {
+                if (btn.dataset.interval === answer) {
                     btn.classList.add(isCorrect ? 'correct' : 'incorrect');
                     setTimeout(() => btn.classList.remove('correct', 'incorrect'), 1500);
                 }
             });
         }
-        
+
         // Update statistics
         function updateStats() {
             document.getElementById('correct-count').textContent = correctCount;
@@ -1964,6 +2112,7 @@
                     document.getElementById('scale-pattern').style.display = 'none';
                     document.getElementById('harmonic-env').style.display = 'none';
                     document.getElementById('play-btn').textContent = '🎹 Play Chord';
+                    createChordAnswerButtons();
                 } else if (currentMode === 'scale-degrees') {
                     document.getElementById('answer-grid').style.display = 'grid';
                     document.getElementById('melody-controls').style.display = 'none';
@@ -1975,6 +2124,7 @@
                     document.getElementById('play-btn').textContent = '🎼 Play Scale Degree';
                     displayScalePattern();
                     updateScaleDegrees();
+                    createScaleDegreeAnswers();
                 } else {
                     document.getElementById('answer-grid').style.display = 'none';
                     document.getElementById('melody-controls').style.display = 'none';
@@ -1988,6 +2138,19 @@
             });
         });
         
+        // Listen mode toggle
+        document.getElementById('listen-mode-btn').addEventListener('click', () => {
+            listenMode = !listenMode;
+            const btn = document.getElementById('listen-mode-btn');
+            if (listenMode) {
+                btn.textContent = '🎧 Listen Mode: On';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = '🎧 Listen Mode: Off';
+                btn.classList.remove('active');
+            }
+        });
+
         // Event listeners
         document.getElementById('play-btn').addEventListener('click', () => {
             if (currentMode === 'intervals') {
@@ -2008,9 +2171,16 @@
             } else if (currentMode === 'melodic' && currentMelody.length > 0) {
                 if (playbackStyle === 'step') {
                     // In step-through mode, replay the current note
+                    // Ensure step index is valid
+                    if (currentStepIndex >= currentMelody.length) {
+                        currentStepIndex = 0;
+                    }
                     if (currentStepIndex >= 0 && currentStepIndex < currentMelody.length) {
                         playNote(midiToFreq(currentMelody[currentStepIndex]), 1, 0);
                         highlightKeys([currentMelody[currentStepIndex]]);
+                        // Ensure step controls are visible and updated
+                        document.getElementById('step-controls').style.display = 'flex';
+                        document.getElementById('step-status').textContent = `Note ${currentStepIndex + 1} of ${currentMelody.length}`;
                     }
                 } else if (playbackStyle === 'separated') {
                     currentMelody.forEach((note, i) => {
@@ -2063,6 +2233,11 @@
                 document.querySelectorAll('.melody-style-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 playbackStyle = btn.dataset.style;
+
+                // Hide step controls when switching away from step mode
+                if (playbackStyle !== 'step') {
+                    document.getElementById('step-controls').style.display = 'none';
+                }
             });
         });
         
@@ -2083,6 +2258,8 @@
         
         // Step-through controls
         document.getElementById('next-note-btn').addEventListener('click', () => {
+            if (currentMelody.length === 0) return;
+
             if (currentStepIndex < currentMelody.length - 1) {
                 currentStepIndex++;
             } else {
@@ -2091,10 +2268,12 @@
             }
             playNote(midiToFreq(currentMelody[currentStepIndex]), 1, 0);
             highlightKeys([currentMelody[currentStepIndex]]);
-            document.getElementById('step-status').textContent = `Note ${currentStepIndex + 1} of ${melodyLength}`;
+            document.getElementById('step-status').textContent = `Note ${currentStepIndex + 1} of ${currentMelody.length}`;
         });
-        
+
         document.getElementById('prev-note-btn').addEventListener('click', () => {
+            if (currentMelody.length === 0) return;
+
             if (currentStepIndex > 0) {
                 currentStepIndex--;
             } else {
@@ -2103,7 +2282,7 @@
             }
             playNote(midiToFreq(currentMelody[currentStepIndex]), 1, 0);
             highlightKeys([currentMelody[currentStepIndex]]);
-            document.getElementById('step-status').textContent = `Note ${currentStepIndex + 1} of ${melodyLength}`;
+            document.getElementById('step-status').textContent = `Note ${currentStepIndex + 1} of ${currentMelody.length}`;
         });
         
         document.getElementById('start-recording-btn').addEventListener('click', () => {
