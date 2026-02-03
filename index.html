@@ -62,12 +62,18 @@
             border-radius: 25px;
             cursor: pointer;
             font-size: 13px;
-            transition: all 0.3s;
+            transition: all 0.15s ease;
             font-weight: 600;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .mode-btn:hover {
             background: #f0f0f0;
+        }
+
+        .mode-btn:active {
+            transform: scale(0.97);
         }
         
         .mode-btn.active {
@@ -100,7 +106,9 @@
         .key {
             position: relative;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.1s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .white-key {
@@ -193,9 +201,16 @@
             border: none;
             border-radius: 30px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.15s ease;
             font-weight: 600;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
         
         .btn-primary {
@@ -231,10 +246,16 @@
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
             font-weight: 600;
             background: #e0e0e0;
             color: #555;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn-small:active {
+            transform: scale(0.97);
         }
 
         .btn-small:hover {
@@ -261,17 +282,24 @@
             color: #667eea;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .answer-btn:hover {
             background: #f0f0ff;
-            transform: scale(1.05);
+            transform: scale(1.02);
+        }
+
+        .answer-btn:active {
+            transform: scale(0.98);
+            background: #e8e8ff;
         }
 
         .answer-btn .play-icon {
@@ -411,11 +439,17 @@
             color: #667eea;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .length-btn:hover {
             background: #f0f0ff;
+        }
+
+        .length-btn:active {
+            transform: scale(0.95);
         }
         
         .length-btn.active {
@@ -436,12 +470,18 @@
             border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
             font-weight: 600;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .playback-btn:hover {
             background: #f8f0ff;
+        }
+
+        .playback-btn:active {
+            transform: scale(0.97);
         }
         
         .playback-btn.active {
@@ -615,12 +655,18 @@
             border-radius: 15px;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.2s;
+            transition: all 0.15s ease;
             font-weight: 600;
+            user-select: none;
+            -webkit-user-select: none;
         }
         
         .env-btn:hover {
             background: #f8f0ff;
+        }
+
+        .env-btn:active {
+            transform: scale(0.97);
         }
         
         .env-btn.active {
@@ -691,43 +737,47 @@
         /* Touch improvements */
         .key, .btn, .mode-btn, .answer-btn, .length-btn, .playback-btn, .env-btn {
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Mobile responsive */
-        @media (max-width: 600px) {
+        /* Tablet and mobile responsive (max-width: 768px) */
+        @media (max-width: 768px) {
             body {
-                padding: 6px;
+                padding: 8px;
             }
 
             .container {
-                padding: 10px;
-                border-radius: 12px;
+                padding: 12px;
+                border-radius: 14px;
             }
 
             h1 {
                 font-size: 1.4em;
-                margin-bottom: 4px;
+                margin-bottom: 2px;
             }
 
             .subtitle {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
                 font-size: 12px;
             }
 
+            /* Mode buttons - larger touch targets */
             .mode-btn {
-                padding: 6px 12px;
-                font-size: 12px;
+                padding: 10px 14px;
+                font-size: 13px;
+                min-height: 44px;
+                border-radius: 22px;
             }
 
             .mode-selector {
-                gap: 5px;
-                margin-bottom: 8px;
+                gap: 6px;
+                margin-bottom: 6px;
             }
 
-            /* Compact stats into a single tight row */
+            /* Stats */
             .stats {
                 padding: 8px;
-                margin: 6px 0;
+                margin: 4px 0;
                 border-radius: 10px;
             }
 
@@ -741,56 +791,77 @@
             }
 
             .practice-area {
-                padding: 8px;
-                margin-bottom: 8px;
+                padding: 10px;
+                margin-bottom: 6px;
             }
 
+            /* Primary action buttons - minimum 44px touch target */
             .btn {
-                padding: 8px 16px;
-                font-size: 13px;
+                padding: 12px 20px;
+                font-size: 15px;
+                min-height: 46px;
+                border-radius: 24px;
+                box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+            }
+
+            .btn:active {
+                transform: scale(0.97);
                 box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             }
 
             .controls {
-                gap: 8px;
-                margin: 8px 0;
+                gap: 10px;
+                margin: 6px 0;
             }
 
+            /* Answer grid - larger buttons for touch */
             .answer-grid {
-                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-                gap: 6px;
-                margin: 8px 0;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 8px;
+                margin: 6px 0;
             }
 
             .answer-btn {
-                padding: 8px;
+                padding: 12px 10px;
+                font-size: 14px;
+                min-height: 46px;
+                border-radius: 12px;
+            }
+
+            .answer-btn:active {
+                transform: scale(0.97);
+            }
+
+            .answer-btn .play-icon {
                 font-size: 13px;
+                padding: 4px 6px;
             }
 
             .degree-answer-grid {
-                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-                gap: 5px;
-                margin: 8px 0;
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+                gap: 6px;
+                margin: 6px 0;
             }
 
             .feedback {
                 font-size: 16px;
-                margin: 6px 0;
-                min-height: 22px;
+                margin: 4px 0;
+                min-height: 24px;
             }
 
             /* Keyboard scaling */
             .keyboard {
                 height: 130px;
                 justify-content: flex-start;
-                margin: 8px 0;
+                margin: 6px 0;
+                padding-bottom: 4px;
             }
 
             .white-key {
-                width: 34px;
+                width: 36px;
                 height: 130px;
                 font-size: 10px;
-                padding-bottom: 4px;
+                padding-bottom: 5px;
             }
 
             .white-key .note-name {
@@ -798,11 +869,11 @@
             }
 
             .white-key .degree-label {
-                font-size: 11px;
+                font-size: 12px;
             }
 
             .black-key {
-                width: 22px;
+                width: 23px;
                 height: 78px;
                 font-size: 8px;
                 padding-bottom: 3px;
@@ -813,7 +884,7 @@
             }
 
             .black-key .degree-label {
-                font-size: 9px;
+                font-size: 10px;
             }
 
             /* Harmonic env */
@@ -828,22 +899,22 @@
             }
 
             .scale-degrees {
-                gap: 5px;
+                gap: 6px;
                 margin-top: 5px;
                 flex-wrap: wrap;
             }
 
             .scale-degrees .degree {
-                width: 28px;
-                height: 28px;
-                font-size: 11px;
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
             }
 
             /* Melody and scale note circles */
             .melody-note {
-                width: 36px;
-                height: 36px;
-                font-size: 13px;
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
             }
 
             .melody-note .scale-degree {
@@ -852,46 +923,46 @@
             }
 
             .melody-display, .user-melody {
-                gap: 6px;
-                margin: 6px 0;
-                min-height: 40px;
+                gap: 8px;
+                margin: 5px 0;
+                min-height: 45px;
                 flex-wrap: wrap;
             }
 
             .recording-status {
                 font-size: 13px;
-                margin: 4px 0;
+                margin: 3px 0;
                 min-height: 18px;
             }
 
             .scale-note {
-                width: 30px;
-                height: 30px;
-                font-size: 11px;
+                width: 32px;
+                height: 32px;
+                font-size: 13px;
             }
 
             .scale-pattern {
-                gap: 4px;
+                gap: 5px;
                 padding: 8px;
-                margin: 6px 0;
+                margin: 5px 0;
                 flex-wrap: wrap;
                 justify-content: center;
             }
 
             .chord-tone {
-                width: 36px;
-                height: 36px;
-                font-size: 11px;
+                width: 38px;
+                height: 38px;
+                font-size: 12px;
             }
 
             .chord-tones {
-                gap: 6px;
+                gap: 8px;
                 margin-top: 5px;
             }
 
             /* Chord info */
             .chord-info {
-                margin: 6px 0;
+                margin: 5px 0;
                 padding: 8px;
             }
 
@@ -906,59 +977,83 @@
             }
 
             .playback-mode {
-                margin: 6px 0;
+                margin: 5px 0;
+                gap: 8px;
             }
 
-            /* Env selector wrapping */
+            /* Env selector - larger touch targets */
             .env-selector {
-                gap: 4px;
+                gap: 6px;
             }
 
             .env-btn {
-                padding: 4px 8px;
-                font-size: 11px;
+                padding: 10px 14px;
+                font-size: 13px;
+                min-height: 44px;
+                border-radius: 22px;
+            }
+
+            .env-btn:active {
+                transform: scale(0.97);
             }
 
             .melody-controls {
                 gap: 8px;
-                margin: 6px 0;
+                margin: 5px 0;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
+            /* Playback buttons - larger touch targets */
             .playback-btn {
-                padding: 5px 10px;
-                font-size: 11px;
+                padding: 10px 16px;
+                font-size: 13px;
+                min-height: 44px;
+                border-radius: 22px;
             }
 
+            .playback-btn:active {
+                transform: scale(0.97);
+            }
+
+            /* Length buttons - 44px minimum */
             .length-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
+                width: 42px;
+                height: 42px;
+                font-size: 15px;
+            }
+
+            .length-btn:active {
+                transform: scale(0.95);
             }
 
             .toggle-label {
-                font-size: 12px;
+                font-size: 13px;
             }
 
             .submit-controls {
-                gap: 6px;
-                margin: 6px 0;
+                gap: 8px;
+                margin: 5px 0;
                 flex-wrap: wrap;
                 justify-content: center;
             }
 
             .scale-degree-controls {
                 gap: 8px;
-                margin: 6px 0;
+                margin: 5px 0;
             }
 
             .sequence-controls, .reference-toggle {
-                gap: 6px;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
-            /* Step controls need wrapping */
+            /* Step controls */
             #step-controls {
                 flex-wrap: wrap;
                 justify-content: center;
+                gap: 8px;
             }
 
             #step-controls .btn {
@@ -968,6 +1063,317 @@
             #step-status {
                 font-size: 13px !important;
                 margin: 4px 8px !important;
+            }
+
+            /* Small toggle button */
+            .btn-small {
+                padding: 8px 14px;
+                font-size: 13px;
+                min-height: 40px;
+            }
+
+            .keyboard-controls {
+                margin-bottom: 6px;
+            }
+        }
+
+        /* Small phone responsive (max-width: 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 4px;
+            }
+
+            .container {
+                padding: 8px;
+                border-radius: 12px;
+            }
+
+            h1 {
+                font-size: 1.25em;
+                margin-bottom: 2px;
+            }
+
+            .subtitle {
+                margin-bottom: 5px;
+                font-size: 11px;
+            }
+
+            /* Mode buttons - stack on very small screens */
+            .mode-selector {
+                gap: 5px;
+                margin-bottom: 5px;
+            }
+
+            .mode-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+                min-height: 42px;
+                flex: 1 1 45%;
+            }
+
+            /* Stats */
+            .stats {
+                padding: 6px;
+                margin: 4px 0;
+            }
+
+            .stat-value {
+                font-size: 18px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .practice-area {
+                padding: 8px;
+                margin-bottom: 5px;
+            }
+
+            /* Buttons */
+            .btn {
+                padding: 10px 18px;
+                font-size: 13px;
+                min-height: 44px;
+            }
+
+            .controls {
+                gap: 6px;
+                margin: 5px 0;
+            }
+
+            /* Answer grid */
+            .answer-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                margin: 5px 0;
+            }
+
+            .answer-btn {
+                padding: 10px 6px;
+                font-size: 12px;
+                min-height: 44px;
+            }
+
+            .degree-answer-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 5px;
+            }
+
+            /* Keyboard - scrollable on small screens */
+            .keyboard {
+                height: 115px;
+                margin: 5px 0;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+
+            .white-key {
+                width: 32px;
+                height: 115px;
+                font-size: 9px;
+                padding-bottom: 4px;
+            }
+
+            .white-key .note-name {
+                font-size: 8px;
+            }
+
+            .white-key .degree-label {
+                font-size: 11px;
+            }
+
+            .black-key {
+                width: 20px;
+                height: 70px;
+                font-size: 7px;
+                padding-bottom: 3px;
+            }
+
+            .black-key .note-name {
+                font-size: 6px;
+            }
+
+            .black-key .degree-label {
+                font-size: 9px;
+            }
+
+            /* Melody notes */
+            .melody-note {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
+
+            .melody-note .scale-degree {
+                font-size: 9px;
+                bottom: -15px;
+            }
+
+            .melody-display, .user-melody {
+                gap: 5px;
+                margin: 4px 0;
+                min-height: 42px;
+            }
+
+            /* Scale pattern */
+            .scale-note {
+                width: 30px;
+                height: 30px;
+                font-size: 11px;
+            }
+
+            .scale-pattern {
+                gap: 4px;
+                padding: 6px;
+                margin: 4px 0;
+            }
+
+            /* Chord tones */
+            .chord-tone {
+                width: 36px;
+                height: 36px;
+                font-size: 11px;
+            }
+
+            /* Environment buttons */
+            .env-selector {
+                gap: 5px;
+            }
+
+            .env-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+                min-height: 40px;
+                flex: 1 1 30%;
+            }
+
+            /* Playback and length controls */
+            .playback-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+                min-height: 40px;
+            }
+
+            .length-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 13px;
+            }
+
+            .melody-controls {
+                gap: 6px;
+                margin: 4px 0;
+            }
+
+            .playback-options {
+                gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .length-selector {
+                gap: 5px;
+            }
+
+            /* Submit controls */
+            .submit-controls {
+                gap: 6px;
+                margin: 4px 0;
+            }
+
+            .submit-controls .btn {
+                flex: 1;
+                min-width: 90px;
+            }
+
+            /* Small button */
+            .btn-small {
+                padding: 6px 12px;
+                font-size: 11px;
+                min-height: 36px;
+            }
+
+            /* Harmonic environment */
+            .harmonic-env {
+                margin: 4px 0;
+                padding: 8px;
+            }
+
+            .harmonic-env h3 {
+                font-size: 13px;
+                margin-bottom: 4px;
+            }
+
+            .scale-degrees .degree {
+                width: 26px;
+                height: 26px;
+                font-size: 10px;
+            }
+
+            /* Sequence controls */
+            .sequence-controls, .reference-toggle {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .scale-degree-controls {
+                gap: 6px;
+            }
+
+            /* Feedback */
+            .feedback {
+                font-size: 14px;
+                margin: 4px 0;
+            }
+
+            /* Chord info */
+            .chord-info {
+                margin: 4px 0;
+                padding: 8px;
+            }
+
+            .chord-info h3 {
+                font-size: 14px;
+            }
+
+            .root-display {
+                font-size: 16px;
+            }
+
+            .recording-status {
+                font-size: 12px;
+                margin: 2px 0;
+            }
+
+            #step-status {
+                font-size: 12px !important;
+                margin: 3px 5px !important;
+            }
+        }
+
+        /* Extra small phones (max-width: 360px) */
+        @media (max-width: 360px) {
+            .mode-btn {
+                padding: 8px 10px;
+                font-size: 11px;
+                flex: 1 1 100%;
+            }
+
+            .answer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .env-btn {
+                flex: 1 1 45%;
+            }
+
+            .white-key {
+                width: 28px;
+            }
+
+            .black-key {
+                width: 18px;
             }
         }
     </style>
