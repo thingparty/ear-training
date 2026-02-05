@@ -1495,6 +1495,14 @@
             
             <div class="keyboard-controls">
                 <button class="btn btn-small" id="listen-mode-btn">🎧 Listen Mode: Off</button>
+                <button class="btn btn-small" id="from-root-btn" style="display: none;">🎵 From Root: Off</button>
+            </div>
+
+            <div class="interval-direction" id="interval-direction" style="display: none; justify-content: center; gap: 6px; margin-bottom: 8px;">
+                <button class="btn btn-small active" data-direction="random">🎲 Random</button>
+                <button class="btn btn-small" data-direction="ascending">↗ Ascending</button>
+                <button class="btn btn-small" data-direction="descending">↘ Descending</button>
+                <button class="btn btn-small" data-direction="harmonic">🎹 Harmonic</button>
             </div>
 
             <div class="keyboard" id="keyboard"></div>
@@ -1519,6 +1527,8 @@
         let correctCount = 0;
         let totalCount = 0;
         let activeKeys = [];
+        let intervalFromRoot = false; // Toggle for intervals starting from root note
+        let intervalDirection = 'random'; // 'random', 'ascending', 'descending', 'harmonic'
         
         // Melodic dictation variables
         let melodyLength = 4;
@@ -1616,25 +1626,45 @@
             }
         }
         
-        // Generate piano tone
+        // Generate piano tone with harmonics
         function playNote(frequency, duration = 1, startTime = 0) {
             initAudio();
-            
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = frequency;
-            oscillator.type = 'sine';
-            
+
             const now = audioContext.currentTime + startTime;
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
-            
-            oscillator.start(now);
-            oscillator.stop(now + duration);
+
+            // Piano uses multiple harmonics for richness
+            const harmonics = [
+                { ratio: 1, gain: 1.0 },      // fundamental
+                { ratio: 2, gain: 0.4 },      // octave
+                { ratio: 3, gain: 0.2 },      // fifth above octave
+                { ratio: 4, gain: 0.15 },     // two octaves
+                { ratio: 5, gain: 0.1 },      // major third above two octaves
+            ];
+
+            harmonics.forEach(h => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = frequency * h.ratio;
+                oscillator.type = 'sine';
+
+                // Piano envelope: sharp attack, quick decay, gentle sustain
+                const peakGain = 0.2 * h.gain;
+                const attack = 0.005;
+                const decay = 0.1;
+                const sustainLevel = peakGain * 0.4;
+
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(peakGain, now + attack);
+                gainNode.gain.exponentialRampToValueAtTime(sustainLevel + 0.001, now + attack + decay);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+                oscillator.start(now);
+                oscillator.stop(now + duration + 0.05);
+            });
         }
         
         // Convert MIDI note to frequency
@@ -1801,20 +1831,38 @@
         // Play interval
         function playInterval() {
             initAudio();
-            
+
             const keyboardStart = 60; // Middle C (C4)
             const keyboardEnd = 84; // C6 (two octaves up)
-            const keyboardRange = keyboardEnd - keyboardStart; // 24 semitones
-            
+
             const interval = intervals[Math.floor(Math.random() * intervals.length)];
-            const direction = Math.random() > 0.5 ? 1 : -1; // Ascending or descending
-            
-            currentInterval = { ...interval, direction };
-            
+
+            // Determine direction based on setting
+            let direction;
+            if (intervalDirection === 'random') {
+                direction = Math.random() > 0.5 ? 1 : -1;
+            } else if (intervalDirection === 'ascending' || intervalDirection === 'harmonic') {
+                direction = 1;
+            } else {
+                direction = -1;
+            }
+
+            currentInterval = { ...interval, direction: intervalDirection === 'harmonic' ? 0 : direction };
+
             // Calculate notes ensuring both stay within keyboard range
             let note1, note2;
-            
-            if (direction > 0) {
+
+            if (intervalFromRoot) {
+                // Start from root note (C4)
+                note1 = keyboardStart;
+                if (direction > 0) {
+                    note2 = note1 + interval.semitones;
+                } else {
+                    // For descending from root, go up an octave first so we can descend
+                    note1 = keyboardStart + 12;
+                    note2 = note1 - interval.semitones;
+                }
+            } else if (direction > 0) {
                 // Ascending: start note must allow interval to fit
                 const maxStart = keyboardEnd - interval.semitones;
                 note1 = keyboardStart + Math.floor(Math.random() * (maxStart - keyboardStart + 1));
@@ -1825,18 +1873,25 @@
                 note1 = minStart + Math.floor(Math.random() * (keyboardEnd - minStart + 1));
                 note2 = note1 - interval.semitones;
             }
-            
+
             currentNotes = [note1, note2];
-            
-            // Play notes
-            playNote(midiToFreq(note1), 1, 0);
-            playNote(midiToFreq(note2), 1, 1);
-            
+
+            // Play notes based on direction setting
+            if (intervalDirection === 'harmonic') {
+                // Play both notes simultaneously
+                playNote(midiToFreq(note1), 1.5, 0);
+                playNote(midiToFreq(note2), 1.5, 0);
+            } else {
+                // Play notes sequentially
+                playNote(midiToFreq(note1), 1, 0);
+                playNote(midiToFreq(note2), 1, 1);
+            }
+
             // Highlight on keyboard after a moment
             setTimeout(() => {
                 highlightKeys(currentNotes);
             }, 100);
-            
+
             document.getElementById('feedback').textContent = '';
         }
 
@@ -1849,11 +1904,30 @@
 
             const keyboardStart = 60; // Middle C (C4)
             const keyboardEnd = 84; // C6
-            const direction = Math.random() > 0.5 ? 1 : -1; // Random ascending or descending
+
+            // Determine direction based on setting
+            let direction;
+            if (intervalDirection === 'random') {
+                direction = Math.random() > 0.5 ? 1 : -1;
+            } else if (intervalDirection === 'ascending' || intervalDirection === 'harmonic') {
+                direction = 1;
+            } else {
+                direction = -1;
+            }
 
             let note1, note2;
 
-            if (direction > 0) {
+            if (intervalFromRoot) {
+                // Start from root note (C4)
+                note1 = keyboardStart;
+                if (direction > 0) {
+                    note2 = note1 + interval.semitones;
+                } else {
+                    // For descending from root, go up an octave first
+                    note1 = keyboardStart + 12;
+                    note2 = note1 - interval.semitones;
+                }
+            } else if (direction > 0) {
                 // Ascending: start note must allow interval to fit above
                 const maxStart = keyboardEnd - interval.semitones;
                 note1 = keyboardStart + Math.floor(Math.random() * (maxStart - keyboardStart + 1));
@@ -1865,9 +1939,14 @@
                 note2 = note1 - interval.semitones;
             }
 
-            // Play notes
-            playNote(midiToFreq(note1), 1, 0);
-            playNote(midiToFreq(note2), 1, 1);
+            // Play notes based on direction setting
+            if (intervalDirection === 'harmonic') {
+                playNote(midiToFreq(note1), 1.5, 0);
+                playNote(midiToFreq(note2), 1.5, 0);
+            } else {
+                playNote(midiToFreq(note1), 1, 0);
+                playNote(midiToFreq(note2), 1, 1);
+            }
 
             // Highlight on keyboard
             highlightKeys([note1, note2]);
@@ -2497,9 +2576,13 @@
                     document.getElementById('scale-degree-controls').style.display = 'none';
                     document.getElementById('scale-pattern').style.display = 'none';
                     document.getElementById('harmonic-env').style.display = 'none';
+                    document.getElementById('from-root-btn').style.display = 'inline-block';
+                    document.getElementById('interval-direction').style.display = 'flex';
                     document.getElementById('play-btn').textContent = '🔊 Play Interval';
                     createAnswerButtons();
                 } else if (currentMode === 'melodic') {
+                    document.getElementById('from-root-btn').style.display = 'none';
+                    document.getElementById('interval-direction').style.display = 'none';
                     document.getElementById('answer-grid').style.display = 'none';
                     document.getElementById('melody-controls').style.display = 'flex';
                     document.getElementById('submit-controls').style.display = 'none';
@@ -2517,6 +2600,8 @@
                     document.getElementById('scale-degree-controls').style.display = 'none';
                     document.getElementById('scale-pattern').style.display = 'none';
                     document.getElementById('harmonic-env').style.display = 'none';
+                    document.getElementById('from-root-btn').style.display = 'none';
+                    document.getElementById('interval-direction').style.display = 'none';
                     document.getElementById('play-btn').textContent = '🎹 Play Chord';
                     createChordAnswerButtons();
                 } else if (currentMode === 'scale-degrees') {
@@ -2527,6 +2612,8 @@
                     document.getElementById('scale-degree-controls').style.display = 'flex';
                     document.getElementById('scale-pattern').style.display = 'flex';
                     document.getElementById('harmonic-env').style.display = 'block';
+                    document.getElementById('from-root-btn').style.display = 'none';
+                    document.getElementById('interval-direction').style.display = 'none';
                     document.getElementById('play-btn').textContent = '🎼 Play Scale Degree';
                     displayScalePattern();
                     updateScaleDegrees();
@@ -2539,6 +2626,8 @@
                     document.getElementById('scale-degree-controls').style.display = 'none';
                     document.getElementById('scale-pattern').style.display = 'none';
                     document.getElementById('harmonic-env').style.display = 'none';
+                    document.getElementById('from-root-btn').style.display = 'none';
+                    document.getElementById('interval-direction').style.display = 'none';
                     document.getElementById('play-btn').textContent = '🔊 Play';
                 }
             });
@@ -2557,6 +2646,28 @@
             }
         });
 
+        // From root toggle (intervals only)
+        document.getElementById('from-root-btn').addEventListener('click', () => {
+            intervalFromRoot = !intervalFromRoot;
+            const btn = document.getElementById('from-root-btn');
+            if (intervalFromRoot) {
+                btn.textContent = '🎵 From Root: On';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = '🎵 From Root: Off';
+                btn.classList.remove('active');
+            }
+        });
+
+        // Interval direction buttons
+        document.querySelectorAll('#interval-direction .btn-small').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#interval-direction .btn-small').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                intervalDirection = btn.dataset.direction;
+            });
+        });
+
         // Event listeners
         document.getElementById('play-btn').addEventListener('click', () => {
             if (currentMode === 'intervals') {
@@ -2572,8 +2683,13 @@
         
         document.getElementById('replay-btn').addEventListener('click', () => {
             if (currentMode === 'intervals' && currentNotes.length > 0) {
-                playNote(midiToFreq(currentNotes[0]), 1, 0);
-                playNote(midiToFreq(currentNotes[1]), 1, 1);
+                if (intervalDirection === 'harmonic') {
+                    playNote(midiToFreq(currentNotes[0]), 1.5, 0);
+                    playNote(midiToFreq(currentNotes[1]), 1.5, 0);
+                } else {
+                    playNote(midiToFreq(currentNotes[0]), 1, 0);
+                    playNote(midiToFreq(currentNotes[1]), 1, 1);
+                }
             } else if (currentMode === 'melodic' && currentMelody.length > 0) {
                 if (playbackStyle === 'step') {
                     // In step-through mode, replay the current note
@@ -2785,6 +2901,9 @@
         createKeyboard();
         createAnswerButtons();
         updateScaleDegrees();
+        // Show interval controls for default interval mode
+        document.getElementById('from-root-btn').style.display = 'inline-block';
+        document.getElementById('interval-direction').style.display = 'flex';
     </script>
 </body>
 </html>
